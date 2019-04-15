@@ -25,8 +25,9 @@ class BuildMode(Enum):
     """
     Modes of building a player's strategy vector
     """
-    UNIFORM = 0
-    RANDOM = 1
+    PURE = 0
+    UNIFORM = 1
+    RANDOM = 2
 
 
 class Player:
@@ -52,6 +53,7 @@ class Player:
 
     # Maps build mode to method
     _build_method = {
+        BuildMode.PURE: lambda n, i: np.array([1 if j == i else 0 for j in range(n)]),
         BuildMode.UNIFORM: lambda n: _normalize(np.ones(n)),
         BuildMode.RANDOM: lambda n: _normalize(np.random.random(n))
     }  # type: Dict[BuildMode, Callable]
@@ -66,7 +68,7 @@ class Player:
             n: number of strategies the player has
             mode: the build mode to use
             kwargs: Optional arguments
-                # TODO: Add 'Pure' build mode, requiring integer to indicate which pure strategy to use
+                PURE: requires i (int)
         """
         return Player(Player._build_method[mode](n, **kwargs))
 
@@ -94,12 +96,16 @@ class NPlayerGame:
             ValueError if the final dimension is not equal to the length of the array's shape minus 1
         """
 
+        if len(payoff.shape) != payoff.shape[-1] + 1:
+            raise ValueError(
+                'Shape of strategy product is {}; final dimension should be {}, not {}'.format(
+                    payoff.shape[:-1], len(payoff.shape) - 1, payoff.shape[-1]))
+
         self.payoff = payoff
         self.n = len(payoff.shape)
         self.players = list(map(
             lambda strategies: Player.build_player(strategies, BuildMode.RANDOM),
             payoff.shape[:-1]))
-        # TODO: Implement shape check
 
     # TODO: Implement gameplay and payoff metrics
 
