@@ -101,16 +101,29 @@ class NPlayerGame:
                 'Shape of strategy product is {}; final dimension should be {}, not {}'.format(
                     payoff.shape[:-1], len(payoff.shape) - 1, payoff.shape[-1]))
 
-        self.payoff = payoff
-        self.n = len(payoff.shape)
+        self.payoff = payoff  # type: np.array
+        self.n = len(payoff.shape) - 1  # type: int
+        self.winnings = np.zeros(self.n)  # type: np.array
+        # TODO: This should really be moved to a factory method; please do so and then have constructor check sizes
         self.players = list(map(
             lambda strategies: Player.build_player(strategies, BuildMode.RANDOM),
-            payoff.shape[:-1]))
+            payoff.shape[:-1]))  # type: List[Player]
 
-    # TODO: Implement gameplay and payoff metrics
+    def run(self, n=1):
+        # type: (Optional[int]) -> None
+        """
+        Run the game n times
+
+        Args:
+            n: times to run the game
+        """
+        for _ in range(n):
+            self.winnings += self.payoff[tuple(player.play() for player in self.players)]
 
 
 if __name__ == '__main__':
-    pass
-    # TODO: Initialize and run a sample game
+    A = np.random.random((5, 6, 7, 3))
+    game = NPlayerGame(A)
+    game.run(20)
+    print(game.winnings)
 
