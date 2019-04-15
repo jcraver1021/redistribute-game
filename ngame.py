@@ -1,6 +1,7 @@
 import numpy as np
+
 from enum import Enum
-from typing import Any, Dict, Callable, Optional
+from typing import Any, Dict, Callable, List, Optional
 
 
 def _normalize(x, order=1.0):
