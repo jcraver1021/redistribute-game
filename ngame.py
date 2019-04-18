@@ -105,6 +105,7 @@ class NPlayerGame:
         self.payoff = payoff  # type: np.array
         self.n = len(payoff.shape) - 1  # type: int
         self.winnings = np.zeros(self.n)  # type: np.array
+        self.record = np.zeros((0, self.n))  # type: np.array
         # TODO: This should really be moved to a factory method; please do so and then have constructor check sizes
         self.players = list(map(
             lambda strategies: Player.build_player(strategies, BuildMode.RANDOM),
@@ -119,12 +120,15 @@ class NPlayerGame:
             n: times to run the game
         """
         for _ in range(n):
-            self.winnings += self.payoff[tuple(player.play() for player in self.players)]
+            plays = tuple(player.play() for player in self.players)
+            self.record = np.vstack((self.record, plays))
+            self.winnings += self.payoff[plays]
 
 
 if __name__ == '__main__':
-    A = np.random.random((5, 6, 7, 3))
+    A = np.random.random((5, 6, 7, 3)) - 0.5
     game = NPlayerGame(A)
     game.run(20)
+    print(game.record)
     print(game.winnings)
 
