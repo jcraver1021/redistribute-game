@@ -99,7 +99,7 @@ class Player:
 
 
 class NPlayerGame:
-    def __init__(self, payoff):
+    def __init__(self, payoff, players):
         """
         An N-Player game based on a set n+1-dimensional array.
         The number of players and the number of strategies each player has are interpreted solely
@@ -114,17 +114,19 @@ class NPlayerGame:
             ValueError if the final dimension is not equal to the length of the array's shape minus 1
         """
 
-        if len(payoff.shape) != payoff.shape[-1] + 1:
+        n = len(payoff.shape) - 1
+        if n != payoff.shape[-1]:
             raise ValueError(
                 'Shape of strategy product is {}; final dimension should be {}, not {}'.format(
-                    payoff.shape[:-1], len(payoff.shape) - 1, payoff.shape[-1]))
+                    payoff.shape[:-1], n, payoff.shape[-1]))
+
+        if len(players) != n:
+            raise ValueError(
+                'The game is for {} players, but the number of players is {}'.format(n, len(players)))
 
         self.payoff = payoff  # type: np.array
-        self.n = len(payoff.shape) - 1  # type: int
-        # TODO: This should really be moved to a factory method; please do so and then have constructor check sizes
-        self.players = list(map(
-            lambda strategies: Player.build_player(strategies, BuildMode.RANDOM),
-            payoff.shape[:-1]))  # type: List[Player]
+        self.n = n  # type: int
+        self.players = players  # type: List[Player]
 
     def run(self, n=1):
         # type: (Optional[int]) -> None
@@ -142,10 +144,11 @@ class NPlayerGame:
 
 if __name__ == '__main__':
     A = np.random.random((5, 6, 7, 3)) - 0.5
-    game = NPlayerGame(A)
+    P = [Player.build_player(3, BuildMode.RANDOM) for _ in range(3)]
+    game = NPlayerGame(A, P)
     print('Game:\n{}'.format(game.payoff))
     game.run(20)
-    for i, p in enumerate(game.players):
+    for i, p in enumerate(P):
         print('Player {} has {}'.format(i, p.winnings))
         print('Player {} played {}'.format(i, p.history))
 
