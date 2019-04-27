@@ -144,7 +144,7 @@ class NPlayerGame:
 
 if __name__ == '__main__':
     A = np.random.random((5, 6, 7, 3)) - 0.5
-    P = [Player.build_player(3, BuildMode.RANDOM) for _ in range(3)]
+    P = [Player.build_player(3, BuildMode.RANDOM) for _ in range(A.shape[-1])]
     game = NPlayerGame(A, P)
     print('Game:\n{}'.format(game.payoff))
     game.run(20)
