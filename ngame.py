@@ -35,7 +35,7 @@ class Player:
     def __init__(self, strategies):
         # type: (np.array) -> None
         """
-        Initialize a player with a set of strategies
+        Initialize a player with a set of strategies, 0 winnings, and an empty history.
 
         Args:
             strategies: A numpy array representing the probability that this player will use
@@ -50,7 +50,11 @@ class Player:
         if not np.isclose(magnitude, 1):
             raise ValueError('Strategy vector is magnitude {}, not 1'.format(magnitude))
 
-        self.strategies = strategies
+        self.strategies = strategies  # type: np.array
+
+        # Accounts maintained on player level
+        self.winnings = 0.0  # type: float
+        self.history = []  # type: List[int]
 
     # Maps build mode to method
     _build_method = {
@@ -76,9 +80,22 @@ class Player:
     def play(self):
         # type: () -> int
         """
-        Choose a strategy based on the stored probabilities
+        Choose a strategy based on the stored probabilities.
+
+        Choice of strategy is appended to personal history.
         """
-        return np.random.choice(len(self.strategies), p=self.strategies)
+        self.history.append(np.random.choice(len(self.strategies), p=self.strategies))
+        return self.history[-1]
+
+    def pay(self, winnings):
+        # type: (float) -> None
+        """
+        Add the new winnings to the total
+
+        Args:
+            winnings: The amount won from the last game
+        """
+        self.winnings += winnings
 
 
 class NPlayerGame:
@@ -89,7 +106,7 @@ class NPlayerGame:
         from the shape of the array.
 
         The first N dimensions represent the player strategies
-        The last dimension is the
+        The last dimension is the payoff to each player.
 
         Args:
             payoff: A n-dimensional array representing the payoffs to each player
@@ -104,8 +121,6 @@ class NPlayerGame:
 
         self.payoff = payoff  # type: np.array
         self.n = len(payoff.shape) - 1  # type: int
-        self.winnings = np.zeros(self.n)  # type: np.array
-        self.record = np.zeros((0, self.n))  # type: np.array
         # TODO: This should really be moved to a factory method; please do so and then have constructor check sizes
         self.players = list(map(
             lambda strategies: Player.build_player(strategies, BuildMode.RANDOM),
@@ -121,14 +136,16 @@ class NPlayerGame:
         """
         for _ in range(n):
             plays = tuple(player.play() for player in self.players)
-            self.record = np.vstack((self.record, plays))
-            self.winnings += self.payoff[plays]
+            for player, winnings in zip(self.players, self.payoff[plays]):
+                player.pay(winnings)
 
 
 if __name__ == '__main__':
     A = np.random.random((5, 6, 7, 3)) - 0.5
     game = NPlayerGame(A)
+    print('Game:\n{}'.format(game.payoff))
     game.run(20)
-    print(game.record)
-    print(game.winnings)
+    for i, p in enumerate(game.players):
+        print('Player {} has {}'.format(i, p.winnings))
+        print('Player {} played {}'.format(i, p.history))
 
