@@ -66,6 +66,19 @@ class Player:
         self.strategies = {}  # type: Dict[NPlayerGame, Dict[int, np.array]]
         self.history = {}  # type: Dict[NPlayerGame, Dict[int, List[int]]]
 
+    @classmethod
+    def make_n_players(cls, n):
+        # type: (int) -> List[Player]
+        """
+        Make a list of n players
+
+        Args:
+            n: Number of players to make
+        Return:
+            List of new players
+        """
+        return [Player() for _ in range(n)]
+
     def learn(self, game, i, strategy):
         # type: (NPlayerGame, int, np.array) -> None
         """
@@ -165,7 +178,7 @@ class NPlayerGame:
 if __name__ == '__main__':
     A = np.random.random((5, 6, 7, 3)) - 0.5
     game = NPlayerGame(A)
-    P = [Player() for _ in range(A.shape[-1])]
+    P = Player.make_n_players(A.shape[-1])
     for i, p in enumerate(P):
         p.learn(game, i, build_strategy(A.shape[i], BuildMode.RANDOM))
     print('Game:\n{}'.format(game.payoff))
