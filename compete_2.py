@@ -26,9 +26,8 @@ choose_first = build_strategy(2, BuildMode.PURE, i=0)
 choose_last = build_strategy(2, BuildMode.PURE, i=1)
 mixed = build_strategy(2, BuildMode.UNIFORM)
 
-# There are 4 equilibrium points:
+# There are 3 equilibrium points:
 settings = [
-    [choose_first, choose_first],
     [choose_first, choose_last],
     [choose_last, choose_first],
     [mixed, mixed]
