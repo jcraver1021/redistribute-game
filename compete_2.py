@@ -43,3 +43,18 @@ for setting in settings:
         print('Player {} winnings: {}'.format(i, player.winnings))
     print('Total winnings: {}'.format(winnings_total(players)))
     print()
+
+# Now compare it to an artificial solution
+# Each player will go when they are first, but we will alternate positions each time
+players = Player.make_n_players(2)
+for player in players:
+    player.learn(game, 0, choose_first)
+    player.learn(game, 1, choose_last)
+for _ in range(100):
+    game.run(players)
+    players.reverse()
+
+print('Alternating Usage')
+for i, player in enumerate(players):
+    print('Player {} winnings: {}'.format(i, player.winnings))
+print('Total winnings: {}'.format(winnings_total(players)))
