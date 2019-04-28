@@ -38,8 +38,8 @@ for setting in settings:
     players = Player.make_n_players(2)
     try_game(game, players, setting, 100)
     print('Setting: {}'.format(setting))
-    for i, player in enumerate(players):
-        print('Player {} winnings: {}'.format(i, player.winnings))
+    for player in players:
+        print('{} winnings: {}'.format(player, player.winnings))
     print('Total winnings: {}'.format(winnings_total(players)))
     print()
 
@@ -54,6 +54,6 @@ for _ in range(100):
     players.reverse()
 
 print('Alternating Usage')
-for i, player in enumerate(players):
-    print('Player {} winnings: {}'.format(i, player.winnings))
+for player in players:
+    print('{} winnings: {}'.format(player, player.winnings))
 print('Total winnings: {}'.format(winnings_total(players)))

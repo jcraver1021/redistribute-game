@@ -52,32 +52,48 @@ def build_strategy(n, mode, **kwargs):
     return _build_method[mode](n, **kwargs)
 
 
+def get_next_name():
+    global _calls
+    _calls += 1
+    return 'Player {}'.format(_calls)
+
+
 class Player:
-    def __init__(self):
-        # type: (np.array) -> None
+    def __init__(self, name):
+        # type: (str) -> None
         """
         Initialize a player with 0 winnings and an empty history.
+
+        Args:
+            name: Player name
         """
 
         # State maintained on player level
         self.winnings = 0.0  # type: float
+        self.name = name
 
         # State maintained on game level
         self.strategies = {}  # type: Dict[NPlayerGame, Dict[int, np.array]]
         self.history = {}  # type: Dict[NPlayerGame, Dict[int, List[int]]]
 
     @classmethod
-    def make_n_players(cls, n):
+    def make_n_players(cls, n, names=None):
         # type: (int) -> List[Player]
         """
         Make a list of n players
 
         Args:
             n: Number of players to make
+            names: Player names (must be iterable of length n)
         Return:
             List of new players
         """
-        return [Player() for _ in range(n)]
+        if names:
+            if len(names) != n:
+                raise(ValueError('{} names were given, but the number of players is {}'.format(len(names), n)))
+            return [Player(name) for name in names]
+        else:
+            return [Player('Player {}'.format(i)) for i in range(n)]
 
     def learn(self, game, i, strategy):
         # type: (NPlayerGame, int, np.array) -> None
@@ -103,7 +119,9 @@ class Player:
             self.strategies[game] = {}
             self.history[game] = {}
         self.strategies[game][i] = strategy
-        self.history[game][i] = []
+        # You can relearn strategies, but we want to remember what you did
+        if i not in self.history[game]:
+            self.history[game][i] = []
 
     def play(self, game, i):
         # type: (NPlayerGame, int) -> int
@@ -129,6 +147,9 @@ class Player:
             winnings: The amount won from the last game
         """
         self.winnings += winnings
+
+    def __str__(self):
+        return '{}: ${}'.format(self.name, self.winnings)
 
 
 class NPlayerGame:
@@ -184,6 +205,6 @@ if __name__ == '__main__':
     print('Game:\n{}'.format(game.payoff))
     game.run(P, 20)
     for i, p in enumerate(P):
-        print('Player {} has {}'.format(i, p.winnings))
-        print('Player {} played {}'.format(i, p.history))
+        print(p)
+        print('{} played {}'.format(p.name, p.history))
 
