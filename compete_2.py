@@ -39,8 +39,8 @@ for setting in settings:
     try_game(game, players, setting, 100)
     print('Setting: {}'.format(setting))
     for player in players:
-        print('{} winnings: {}'.format(player, player.winnings))
-    print('Total winnings: {}'.format(winnings_total(players)))
+        print(player)
+    print('Total winnings: ${}'.format(winnings_total(players)))
     print()
 
 # Now compare it to an artificial solution
@@ -55,5 +55,5 @@ for _ in range(100):
 
 print('Alternating Usage')
 for player in players:
-    print('{} winnings: {}'.format(player, player.winnings))
-print('Total winnings: {}'.format(winnings_total(players)))
+    print(player)
+print('Total winnings: ${}'.format(winnings_total(players)))

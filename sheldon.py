@@ -10,7 +10,7 @@ def try_game(game, players, strategies, n=1):
 
 def winnings_total(players):
     """Sum the winnings of all players"""
-    return sum(map(lambda p: p.winnings, players))
+    return 'Total: ${}'.format(sum(map(lambda p: p.winnings, players)))
 
 
 names = ['Sheldon', 'Raj', 'Leonard']
