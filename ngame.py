@@ -152,6 +152,11 @@ class Player:
         return '{}: ${}'.format(self.name, self.winnings)
 
 
+def identity_mechanism(x, y, z):
+    # type: (Any, Any, Any) -> Any
+    return x
+
+
 class NPlayerGame:
     def __init__(self, payoff):
         """
@@ -177,14 +182,15 @@ class NPlayerGame:
         self.payoff = payoff  # type: np.array
         self.n = n  # type: int
 
-    def run(self, players, n=1):
-        # type: (List[Player], Optional[int]) -> None
+    def run(self, players, n=1, mechanism=identity_mechanism):
+        # type: (List[Player], Optional[int], Optional[Callable]) -> None
         """
         Run the game n times
 
         Args:
             players: Players playing the game
             n: times to run the game
+            mechanism: mechanism to adjust payoff based on other factors
         """
         if len(players) != self.n:
             raise ValueError(
@@ -192,7 +198,8 @@ class NPlayerGame:
 
         for i in range(n):
             plays = tuple(player.play(self, j) for j, player in enumerate(players))
-            for player, winnings in zip(players, self.payoff[plays]):
+            payoff = mechanism(self.payoff[plays], players, self)
+            for player, winnings in zip(players, payoff):
                 player.pay(winnings)
 
 
