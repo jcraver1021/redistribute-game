@@ -125,6 +125,11 @@ for i in range(1000):
             elif potential == worst_case:
                 player.learn(game, j, mixed)
             player.history[game][j].pop()
+    if i % 10 == 0 :
+    	if (players[1].strategies[game][1] == players[2].strategies[game][2]).all():
+			current_strat = players[1].strategies[game][1]
+			player_id = np.random.randint(2) + 1
+			players[player_id].learn(game, player_id, np.ones(2) - party)
     game.run(players, mechanism=repeat_mechanism)
 for player in players:
     print(player)
