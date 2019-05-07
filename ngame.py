@@ -52,12 +52,6 @@ def build_strategy(n, mode, **kwargs):
     return _build_method[mode](n, **kwargs)
 
 
-def get_next_name():
-    global _calls
-    _calls += 1
-    return 'Player {}'.format(_calls)
-
-
 class Player:
     def __init__(self, name):
         # type: (str) -> None
@@ -78,7 +72,7 @@ class Player:
 
     @classmethod
     def make_n_players(cls, n, names=None):
-        # type: (int) -> List[Player]
+        # type: (int, Optional[List[str]]) -> List[Player]
         """
         Make a list of n players
 
@@ -196,8 +190,8 @@ class NPlayerGame:
             raise ValueError(
                 'The game is for {} players, but the number of players is {}'.format(self.n, len(players)))
 
-        for i in range(n):
-            plays = tuple(player.play(self, j) for j, player in enumerate(players))
+        for _ in range(n):
+            plays = tuple(player.play(self, i) for i, player in enumerate(players))
             payoff = mechanism(self.payoff[plays], players, self)
             for player, winnings in zip(players, payoff):
                 player.pay(winnings)
